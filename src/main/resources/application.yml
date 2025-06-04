@@ -15,5 +15,7 @@ logging:
     ROOT: ${LOG_LEVEL:INFO}
     ru.t1.java.demo.controller.ClientController: DEBUG
 
+  liquibase=DEBUG:
+
 t1:
   scan-path: ru.t1.java.demo
