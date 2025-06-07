@@ -19,3 +19,9 @@ logging:
 
 t1:
   scan-path: ru.t1.java.demo
+
+metric:
+  method-time-limit: -1
+
+ru.t1.java.demo.cache:
+  record-lifetime: 60000

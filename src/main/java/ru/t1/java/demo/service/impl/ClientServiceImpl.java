@@ -3,7 +3,9 @@ package ru.t1.java.demo.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.t1.java.demo.aop.annotation.Cached;
 import ru.t1.java.demo.aop.annotation.LogDataSourceError;
+import ru.t1.java.demo.aop.annotation.Metric;
 import ru.t1.java.demo.dto.ClientDto;
 import ru.t1.java.demo.exception.ClientNotFoundException;
 import ru.t1.java.demo.mapper.ClientMapper;
@@ -21,8 +23,9 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
 
+    @Metric
+    @Cached
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public ClientDto getById(UUID id) {
         Client client = clientRepository.findById(id)
@@ -30,8 +33,9 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(client);
     }
 
+    @Metric
+    @Cached
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public ClientDto getByClientId(UUID clientId) {
         Client client = clientRepository.findByClientId(clientId)
@@ -39,8 +43,9 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(client);
     }
 
+    @Cached
+    @Metric
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public List<ClientDto> getAll() {
         return clientRepository.findAll()
@@ -49,6 +54,7 @@ public class ClientServiceImpl implements ClientService {
                 .collect(Collectors.toList());
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override
@@ -59,6 +65,7 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(saved);
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override
@@ -75,6 +82,7 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(updated);
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override

@@ -24,4 +24,9 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
         <rollback/>
     </changeSet>
 
+    <changeSet id="create_table_time_limit_exceed_log" author="SviriAnna">
+        <sqlFile encoding="utf8" path="db/changelog/2025.06/05-06-changelog-01.sql"/>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

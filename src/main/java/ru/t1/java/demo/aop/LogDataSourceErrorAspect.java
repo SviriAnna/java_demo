@@ -1,11 +1,12 @@
 package ru.t1.java.demo.aop;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 import ru.t1.java.demo.service.DataSourceErrorLogService;
@@ -16,7 +17,8 @@ import java.io.StringWriter;
 @Slf4j
 @Aspect
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Order(2)
 public class LogDataSourceErrorAspect {
 
     private final DataSourceErrorLogService dataSourceErrorLogService;

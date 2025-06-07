@@ -1,11 +1,14 @@
 package ru.t1.java.demo;
 
+import ru.t1.java.demo.cache.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
 @Slf4j
+@EnableConfigurationProperties(CacheProperties.class)
 public class T1JavaDemoApplication {
 
     public static void main(String[] args) {
