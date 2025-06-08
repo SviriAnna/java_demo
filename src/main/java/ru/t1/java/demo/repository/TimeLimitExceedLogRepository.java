@@ -2,12 +2,10 @@ package ru.t1.java.demo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.t1.java.demo.model.Account;
+import ru.t1.java.demo.model.TimeLimitExceedLog;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, UUID> {
-    List<Account> findByClientId(UUID clientId);
+public interface TimeLimitExceedLogRepository extends JpaRepository<TimeLimitExceedLog, UUID> {
 }

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.t1.java.demo.aop.annotation.Cached;
 import ru.t1.java.demo.aop.annotation.LogDataSourceError;
+import ru.t1.java.demo.aop.annotation.Metric;
 import ru.t1.java.demo.dto.AccountDto;
 import ru.t1.java.demo.exception.AccountNotFoundException;
 import ru.t1.java.demo.exception.ClientNotFoundException;
@@ -28,8 +30,9 @@ public class AccountServiceImpl implements AccountService {
     private final ClientRepository clientRepository;
     private final AccountMapper accountMapper;
 
+    @Cached
+    @Metric
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public AccountDto getAccount(UUID id) {
         Account account = accountRepository.findById(id)
@@ -37,8 +40,9 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toDto(account);
     }
 
+    @Cached
+    @Metric
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public List<AccountDto> getAllAccountsByClientId(UUID clientId) {
         boolean clientExists = clientRepository.existsById(clientId);
@@ -53,8 +57,9 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Cached
+    @Metric
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
     public List<AccountDto> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
@@ -63,6 +68,7 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override
@@ -82,6 +88,7 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toDto(saved);
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override
@@ -98,6 +105,7 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toDto(updated);
     }
 
+    @Metric
     @LogDataSourceError
     @Transactional
     @Override
@@ -105,6 +113,5 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
         accountRepository.delete(account);
-
     }
 }
