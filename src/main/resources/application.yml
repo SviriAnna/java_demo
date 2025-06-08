@@ -9,16 +9,39 @@ spring:
   liquibase:
     enabled: true
     change-log: db/changelog/db.changelog-master.xml
+  kafka:
+    bootstrap-servers: 192.168.0.92:9092,192.168.0.92:9093
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        delivery.timeout.ms: 5000
+        request.timeout.ms: 30000
+      retries: 1
+    consumer:
+      group-id: t1-demo
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    admin:
+      auto-create: false
+      properties:
+        allow.auto.create.topics: false
+    properties:
+      security.protocol: PLAINTEXT
+    metrics:
+      topic: t1_demo_metrics
 
 logging:
   level:
     ROOT: ${LOG_LEVEL:INFO}
     ru.t1.java.demo.controller.ClientController: DEBUG
 
-  liquibase=DEBUG:
-
 t1:
   scan-path: ru.t1.java.demo
+  kafka:
+    bootstrap:
+      server: localhost:29092
 
 metric:
   method-time-limit: -1
