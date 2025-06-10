@@ -15,8 +15,13 @@
     <groupId>ru.t1.java.demo</groupId>
     <artifactId>t1-java-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>t1-java-demo</name>
     <description>t1-java-demo</description>
+    <modules>
+        <module>duplicate_transaction_blocker</module>
+        <module>main_module</module>
+    </modules>
 
     <properties>
         <java.version>17</java.version>

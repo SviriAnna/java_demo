@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: t1-java-demo
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/t1_demo"
+    username: "postgres"
+    password: "0000"
+    driverClassName: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.xml
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+
+logging:
+  level:
+    ROOT: ${LOG_LEVEL:INFO}
+    ru.t1.java.demo.controller.ClientController: DEBUG
+
+t1:
+  scan-path: ru.t1.java.demo
+  kafka:
+    bootstrap:
+      server: localhost:29092
+    consumer:
+      group-id: t1-demo
+      max.poll.records: 10
+      session-timeout: 10000
+      heartbeat.interval: 3000
+    producer:
+      enable: true
+    topic:
+      transaction: t1_demo_transactions
+
+      transaction_result: t1_demo_transaction_result
+    listener:
+      poll-timeout: 1000
+
+metric:
+  method-time-limit: -1
+
+ru.t1.java.demo.cache:
+  record-lifetime: 60000
+
+
+
