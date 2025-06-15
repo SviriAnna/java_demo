@@ -1,8 +1,8 @@
 package ru.t1.java.demo.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.t1.java.demo.aop.annotation.Cached;
@@ -12,13 +12,9 @@ import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.dto.TransactionResultDto;
 import ru.t1.java.demo.exception.AccountNotFoundException;
 import ru.t1.java.demo.exception.TransactionNotFoundException;
-import ru.t1.java.demo.kafka.KafkaTransactionProducer;
-import ru.t1.java.demo.kafka.TransactionAcceptMessage;
 import ru.t1.java.demo.mapper.TransactionMapper;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
-import ru.t1.java.demo.model.enums.AccountStatus;
-import ru.t1.java.demo.model.enums.TransactionStatus;
 import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.TransactionRepository;
 import ru.t1.java.demo.service.TransactionService;
@@ -37,7 +33,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final TransactionMapper transactionMapper;
-    private final KafkaTransactionProducer kafkaTransactionProducer;
+    private final TransactionProcessor processor;
+    private final TransactionResultHandler transactionResultHandler;
+
+    @Value("${transaction.max-rejected-count}")
+    private int maxRejectedCount;
 
     @Cached
     @Metric
@@ -142,52 +142,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void processTransaction(TransactionDto transactionDto) {
-        log.info("Началась обработка транзакции: {}", transactionDto);
-
+    public void processTransaction(TransactionDto dto) {
         try {
-            log.info("Поиск счёта с ID: {}", transactionDto.getAccountId());
-            Account account = accountRepository.findByIdForUpdate(transactionDto.getAccountId())
-                    .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + transactionDto.getAccountId()));
-            log.info("Счёт найден: ID={}, статус={}, баланс={}", account.getAccountId(), account.getAccountStatus(), account.getBalance());
-
-            Transaction transaction = transactionMapper.toEntity(transactionDto);
-            transaction.setId(null);
-            transaction.setTransactionId(UUID.randomUUID());
-            transaction.setAccount(account);
-            transaction.setTransactionTime(LocalDateTime.now());
-
-            if (!account.getAccountStatus().equals(AccountStatus.OPEN)) {
-                log.warn("Попытка провести транзакцию по счёту с недопустимым статусом: {}", account.getAccountStatus());
-                transaction.setTransactionStatus(TransactionStatus.REJECTED);
-                transactionRepository.save(transaction);
-                log.info("Транзакция сохранена с статусом REJECTED: transactionId={}", transaction.getTransactionId());
-                return;
-            }
-
-            transaction.setTransactionStatus(TransactionStatus.REQUESTED);
-
-            log.info("Корректировка баланса на сумму: {}", transaction.getAmount().negate());
-            adjustAccountBalance(account, transaction.getAmount().negate());
-            accountRepository.save(account);
-            log.info("Счёт обновлён: ID={}, новый баланс={}", account.getAccountId(), account.getBalance());
-
-            Transaction savedTransaction = transactionRepository.save(transaction);
-            log.info("Транзакция сохранена: ID={}, transactionId={}", savedTransaction.getId(), savedTransaction.getTransactionId());
-
-            TransactionAcceptMessage acceptMessage = new TransactionAcceptMessage(
-                    account.getClient().getClientId(),
-                    account.getAccountId(),
-                    savedTransaction.getTransactionId(),
-                    savedTransaction.getTransactionTime(),
-                    savedTransaction.getAmount(),
-                    account.getBalance().add(savedTransaction.getAmount())
-            );
-            kafkaTransactionProducer.sendTransactionAccepted(acceptMessage);
-            log.info("Отправлено сообщение о приёме транзакции со статусом REQUESTED в Kafka: {}", acceptMessage);
-
+            processor.process(dto);
         } catch (Exception e) {
-            log.error("Ошибка при обработке транзакции: {}", transactionDto, e);
+            log.error("Ошибка при обработке транзакции: {}", dto, e);
             throw e;
         }
     }
@@ -195,48 +154,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void handleTransactionResult(TransactionResultDto dto) {
-        log.info("Из t1_demo_transaction_result пришла транзакция с параметрами: transactionId = {}, accountId = {}, transactionStatus = {}",
-                dto.getTransactionId(), dto.getAccountId(), dto.getTransactionStatus());
-
-        Transaction transaction = transactionRepository.findByTransactionId(dto.getTransactionId());
-        if (transaction == null) {
-            throw new EntityNotFoundException("Transaction not found: " + dto.getTransactionId());
-        }
-
-        log.info("Производится поиск аккаунта по транзакции");
-        Account account = accountRepository.findByAccountIdForUpdate(dto.getAccountId())
-                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + dto.getAccountId()));
-
-        log.info("По данной транзакции найден аккаунт со статусом {}", account.getAccountStatus());
-
-        switch (dto.getTransactionStatus()) {
-            case ACCEPTED -> {
-                log.info("Производится подтверждение транзакции");
-                transaction.setTransactionStatus(TransactionStatus.ACCEPTED);
-                transactionRepository.save(transaction);
-            }
-            case BLOCKED -> {
-                log.info("Производится блокировка транзакции");
-                transaction.setTransactionStatus(TransactionStatus.BLOCKED);
-
-                log.info("Производится заморозка на сумму транзакции: {}", transaction.getAmount());
-                account.setFrozenAmount(account.getFrozenAmount().add(transaction.getAmount()));
-
-                log.info("Производится блокировка счета");
-                account.setAccountStatus(AccountStatus.BLOCKED);
-
-                accountRepository.save(account);
-            }
-            case REJECTED -> {
-                log.info("Производится отклонение транзакции");
-                transaction.setTransactionStatus(TransactionStatus.REJECTED);
-                transactionRepository.save(transaction);
-                account.setBalance(account.getBalance().add(transaction.getAmount()));
-                accountRepository.save(account);
-            }
-        }
-        log.info("Транзакции присовен статус {}, произведено сохранение в базу", transaction.getTransactionStatus());
-        log.info("Аккаунту присвоены следующие параметры: сумма заморозки {}, баланс {}, статус {}", account.getFrozenAmount(), account.getBalance(), account.getAccountStatus());
+        transactionResultHandler.handle(dto);
     }
 
     /**

@@ -11,7 +11,10 @@ spring:
     change-log: db/changelog/db.changelog-master.xml
   jackson:
     property-naming-strategy: SNAKE_CASE
-
+  security:
+    token: yfewyu7294bfj2h9uhbt5gty73uio32i4jhrbvfweigurh32e6789f90uvjnslilaoyegfwwf0001huebf384y5673894uh
+    expiration: 86400000
+  integration:
 
 logging:
   level:
@@ -42,6 +45,16 @@ metric:
 
 ru.t1.java.demo.cache:
   record-lifetime: 60000
+
+black.list.checker:
+  reject-threshold: 3
+
+integration:
+  url: http://localhost:8083/api/status/check
+
+transaction:
+  max-rejected-count: 5
+
 
 
 

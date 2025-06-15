@@ -3,6 +3,8 @@ package ru.t1.java.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
+import ru.t1.java.demo.model.enums.AccountStatus;
+import ru.t1.java.demo.model.enums.ClientStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +29,10 @@ public class Client extends AbstractPersistable<UUID> {
 
     @Column(name = "middle_name")
     private String middleName;
+
+    @Column(name = "client_status")
+    @Enumerated(EnumType.STRING)
+    private ClientStatus clientStatus;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Account> accounts;

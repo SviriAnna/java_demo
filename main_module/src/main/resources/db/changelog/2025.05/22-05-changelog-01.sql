@@ -11,5 +11,6 @@ CREATE TABLE clients
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     middle_name VARCHAR(255),
+    client_status VARCHAR(20),
     client_id UUID NOT NULL UNIQUE
 );
