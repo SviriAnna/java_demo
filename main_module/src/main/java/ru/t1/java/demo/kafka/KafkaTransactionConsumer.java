@@ -7,6 +7,8 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.dto.TransactionResultDto;
@@ -28,17 +30,17 @@ public class KafkaTransactionConsumer {
                         Acknowledgment ack,
                         @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
-        log.info("Transaction consumer: Получен батч из {} сообщений из топика {}", messageList.size(),topic);
+        log.info("Transaction consumer: Получен батч из {} сообщений из топика {}", messageList.size(), topic);
 
-        for (TransactionDto message : messageList) {
-            try {
+        try {
+            for (TransactionDto message : messageList) {
                 transactionService.processTransaction(message);
-            } catch (Exception e) {
-                log.error("Ошибка при обработке транзакции: {}", message, e);
-                return;
             }
+            ack.acknowledge();
+        } catch (Exception e) {
+            log.error("Ошибка при обработке транзакции: ", e);
+            // Можно решить, как поступать с ошибкой — либо вернуть, либо обработать
         }
-        ack.acknowledge();
     }
 
     @KafkaListener(
