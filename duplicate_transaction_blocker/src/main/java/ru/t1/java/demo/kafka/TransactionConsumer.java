@@ -1,6 +1,6 @@
 package ru.t1.java.demo.kafka;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,15 +12,21 @@ import ru.t1.java.demo.service.TransactionProcessorService;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Component
 public class TransactionConsumer {
 
     private final TransactionProcessorService processorService;
+
     private final KafkaTemplate<String, TransactionResultMessage> kafkaTemplate;
 
     @Value("${kafka.topics.transaction_result}")
     private String transactionResultTopic;
+
+    public TransactionConsumer(TransactionProcessorService processorService,
+                               @Qualifier("duplicateTransactionKafkaTemplate") KafkaTemplate<String, TransactionResultMessage> kafkaTemplate) {
+        this.processorService = processorService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @KafkaListener(
             topics = "${kafka.topics.transaction_accept}",

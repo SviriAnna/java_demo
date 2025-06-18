@@ -21,13 +21,14 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    @Value("${t1.kafka.bootstrap.server}")
+    @Value("${t1.kafka.server}")
     private String servers;
 
     // Producer for TransactionDto
     @Bean("transactionProducerFactory")
     @ConditionalOnProperty(value = "t1.kafka.producer.enable", havingValue = "true", matchIfMissing = true)
     public ProducerFactory<String, TransactionDto> transactionProducerFactory() {
+        System.out.println("Kafka bootstrap servers: " + servers);
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -61,15 +62,14 @@ public class KafkaProducerConfig {
             @Qualifier("transactionAcceptProducerFactory") ProducerFactory<String, TransactionAcceptMessage> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
-
-    // Optional: generic string producer
-    @Bean("stringKafkaTemplate")
-    public KafkaTemplate<String, String> stringKafkaTemplate() {
-        Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        ProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(configProps);
-        return new KafkaTemplate<>(producerFactory);
-    }
+//
+//    @Bean("stringKafkaTemplate")
+//    public KafkaTemplate<String, String> stringKafkaTemplate() {
+//        Map<String, Object> configProps = new HashMap<>();
+//        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+//        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+//        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+//        ProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(configProps);
+//        return new KafkaTemplate<>(producerFactory);
+//    }
 }

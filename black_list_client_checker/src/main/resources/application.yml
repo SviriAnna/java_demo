@@ -17,6 +17,9 @@ logging:
 server:
   port: 8083
 
+kafka:
+  enabled=false:
+
 
 
 

@@ -22,6 +22,7 @@
         <module>duplicate_transaction_blocker</module>
         <module>main_module</module>
         <module>black_list_client_checker</module>
+        <module>metric-logging-starter</module>
     </modules>
 
     <properties>
@@ -218,6 +219,11 @@
             <version>1.3.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>ru.t1.java.demo</groupId>
+            <artifactId>metric-logging-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
