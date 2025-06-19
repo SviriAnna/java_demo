@@ -1,0 +1,26 @@
+spring:
+  security:
+    token: yfewyu7294bfj2h9uhbt5gty73uio32i4jhrbvfweigurh32e6789f90uvjnslilaoyegfwwf0001huebf384y5673894uh
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk‑set‑uri: https://auth‑server/.../certs
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+logging:
+  level:
+    ROOT: ${LOG_LEVEL:INFO}
+    ru.t1.java.demo.controller.ClientController: DEBUG
+
+server:
+  port: 8084
+
+kafka:
+  enabled=false:
+
+
+
+
+

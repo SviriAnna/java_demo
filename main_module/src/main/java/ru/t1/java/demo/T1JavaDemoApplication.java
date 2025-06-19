@@ -3,6 +3,7 @@ package ru.t1.java.demo;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.t1.java.demo.aspect.LogDataSourceErrorAspect;
 import ru.t1.java.demo.cache.CacheProperties;
@@ -15,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @Slf4j
 @EnableConfigurationProperties(CacheProperties.class)
 @EnableTransactionManagement
+@EnableAsync
 public class T1JavaDemoApplication {
 
     public static void main(String[] args) {
