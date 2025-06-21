@@ -13,10 +13,11 @@ import java.util.UUID;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AccountMapper {
 
-    @Mapping(source = "client.id", target = "clientId")
+    @Mapping(source = "client.clientId", target = "clientId")
     AccountDto toDto(Account account);
 
-    @Mapping(source = "clientId", target = "client")
+    @Mapping(source = "id", target = "client.id") // маппит id DTO в id сущности (в суперклассе)
+    @Mapping(source = "clientId", target = "client.clientId")
     Account toEntity(AccountDto dto);
 
     void updateEntityFromDto(AccountDto accountDto, @MappingTarget Account entity);

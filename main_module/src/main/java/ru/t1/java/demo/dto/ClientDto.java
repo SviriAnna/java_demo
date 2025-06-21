@@ -22,9 +22,10 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientDto implements Serializable {
 
+    @JsonProperty(value = "id")
     private UUID id;
 
-    @JsonProperty(value = "client_id", access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(value = "client_id")
     private UUID clientId;
 
     @NotBlank(message = "First name must not be blank")

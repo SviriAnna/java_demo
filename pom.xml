@@ -146,6 +146,11 @@
             <artifactId>spring-batch-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- в pom.xml -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
 
         <!-- Bean Validation API (Jakarta) -->
         <dependency>
@@ -230,6 +235,23 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Wiremock -->
+<!--        <dependency>-->
+<!--            <groupId>org.wiremock</groupId>-->
+<!--            <artifactId>wiremock-standalone</artifactId>-->
+<!--            <version>3.3.1</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>3.10.0</version>
         </dependency>
 
     </dependencies>

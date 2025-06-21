@@ -22,7 +22,7 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransactionDto implements Serializable {
 
-    @JsonProperty("transaction_id")
+    @JsonProperty("id")
     private UUID id;
 
     @JsonProperty(value = "transaction_id", access = JsonProperty.Access.READ_ONLY)

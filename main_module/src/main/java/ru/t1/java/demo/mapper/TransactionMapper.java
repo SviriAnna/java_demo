@@ -27,5 +27,4 @@ public interface TransactionMapper {
         account.setId(accountId);
         return account;
     }
-
 }

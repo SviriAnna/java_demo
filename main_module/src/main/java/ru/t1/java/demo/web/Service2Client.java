@@ -14,7 +14,7 @@ public class Service2Client {
 
     private final WebClient webClient;
 
-    public Service2Client(@Value("${integration.unblock-server-url}") String baseUrl) {
+    public Service2Client(@Value("${integration.url}") String baseUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .filter(logRequest())
@@ -33,6 +33,7 @@ public class Service2Client {
     public Mono<MessageResponse> checkClientStatusWithToken(UUID clientId, UUID accountId, String token) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
+                        .path("/status/check")
                         .queryParam("clientId", clientId)
                         .queryParam("accountId", accountId)
                         .build())
