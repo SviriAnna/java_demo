@@ -36,7 +36,6 @@ t1:
     topic:
       transaction: t1_demo_transactions
       transaction_result: t1_demo_transaction_result
-      transaction_accept: t1_demo_transaction_accept
     metricTopic: t1_demo_metrics
     listener:
       poll-timeout: 1000
@@ -53,7 +52,7 @@ black.list.checker:
   reject-threshold: 3
 
 integration:
-  url: http://localhost:8083/api
+  url: http://localhost:8083/api/
   unblock-server-url: http://localhost:8084/api/unblock
 
 transaction:
@@ -78,11 +77,10 @@ management:
       exposure:
         include: health,info,metrics
 
+# Конфиг для логики блокировки
 transaction-checker:
   window-seconds: 30     # Период времени T
-  threshold: 5
-
-
+  threshold: 5        # Максимальное число транзакций N в период T
 
 
 

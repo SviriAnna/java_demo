@@ -43,6 +43,7 @@ public class TransactionProcessor {
 
     @Transactional
     public void process(TransactionDto dto) {
+        log.info("Началась проверка поступившей транзакции");
         Account account = accountRepository.findByIdForUpdate(dto.getAccountId())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + dto.getAccountId()));
         Client client = account.getClient();
@@ -51,7 +52,9 @@ public class TransactionProcessor {
             if (checkAndBlockClient(dto, account, client)) return;
         }
 
-        if (client.getClientStatus() != null && checkRejectedLimit(dto, account)) return;
+        Boolean bol = checkRejectedLimit(dto, account);
+        if (client.getClientStatus() != null && bol) return;
+        log.info("Bol is {}", bol);
 
         performTransaction(dto, account);
     }
@@ -90,14 +93,16 @@ public class TransactionProcessor {
 
     private void performTransaction(TransactionDto dto, Account account) {
         Transaction t = transactionMapper.toEntity(dto);
-        t.setId(null); t.setTransactionId(UUID.randomUUID());
+//        t.setId(null); t.setTransactionId(UUID.randomUUID());
+        t.setId(dto.getId());
+        t.setTransactionId(dto.getTransactionId());
         t.setAccount(account);
         t.setTransactionTime(LocalDateTime.now());
 
         if (!account.getAccountStatus().equals(AccountStatus.OPEN)) {
             t.setTransactionStatus(TransactionStatus.REJECTED);
             transactionRepository.save(t);
-            log.warn("Rejected txn for non-open account.");
+            log.warn("Транзакция отклонена, так как счет клиента не OPEN");
             return;
         }
 
@@ -114,12 +119,14 @@ public class TransactionProcessor {
             saved.getAmount(),
             account.getBalance().add(saved.getAmount())
         ));
-        log.info("Txn requested and kafka message sent.");
+        log.info("Транзакция со статусом REQUESTED была отправлена после проверки на статус счета OPEN.");
     }
 
     private void saveRejected(TransactionDto dto, Account account) {
         Transaction t = transactionMapper.toEntity(dto);
-        t.setId(null); t.setTransactionId(UUID.randomUUID());
+//        t.setId(null); t.setTransactionId(UUID.randomUUID());
+        t.setId(dto.getId());
+        t.setTransactionId(dto.getTransactionId());
         t.setAccount(account);
         t.setTransactionTime(LocalDateTime.now());
         t.setTransactionStatus(TransactionStatus.REJECTED);

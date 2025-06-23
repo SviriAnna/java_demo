@@ -2,7 +2,6 @@ package ru.t1.java.demo.metrics;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.repository.AccountRepository;

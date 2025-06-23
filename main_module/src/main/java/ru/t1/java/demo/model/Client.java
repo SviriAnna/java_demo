@@ -2,6 +2,7 @@ package ru.t1.java.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.ClientStatus;
@@ -16,7 +17,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "clients")
-public class Client extends AbstractPersistable<UUID> {
+public class Client {
+
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private UUID id;
 
     @Column(name = "client_id", unique = true, nullable = false)
     private UUID clientId;
@@ -40,4 +49,5 @@ public class Client extends AbstractPersistable<UUID> {
     public Client(UUID id) {
         this.setId(id);
     }
+
 }

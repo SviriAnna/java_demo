@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.t1.java.demo.dto.AccountDto;
 import ru.t1.java.demo.dto.ClientDto;
 import ru.t1.java.demo.mapper.AccountMapper;
@@ -108,7 +109,7 @@ public class UnblockScheduler {
 
     private List<AccountDto> getAccounts(int number) {
         List<AccountStatus> statuses = List.of(AccountStatus.ARRESTED, AccountStatus.BLOCKED);
-        return accountRepository.findByAccountStatusIn(statuses, PageRequest.of(0, number))
+        return accountRepository.findByAccountStatusInWithClient(statuses, PageRequest.of(0, number))
                 .stream()
                 .map(accountMapper::toDto)
                 .collect(Collectors.toList());

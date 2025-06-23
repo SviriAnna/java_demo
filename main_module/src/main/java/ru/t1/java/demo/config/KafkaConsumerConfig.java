@@ -2,6 +2,7 @@ package ru.t1.java.demo.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.dto.TransactionResultDto;
+import ru.t1.java.demo.kafka.TransactionAcceptMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -114,5 +116,29 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, heartbeatInterval);
         return props;
+    }
+
+    @Bean
+    public ConsumerFactory<String, TransactionAcceptMessage> transactionAcceptMessageConsumerFactory() {
+        Map<String, Object> props = commonConsumerProps();
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, TransactionAcceptMessage.class.getName());
+
+        DefaultKafkaConsumerFactory<String, TransactionAcceptMessage> factory = new DefaultKafkaConsumerFactory<>(props);
+        factory.setKeyDeserializer(new StringDeserializer());
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, TransactionAcceptMessage> transactionAcceptMessageKafkaListenerContainerFactory(
+            ConsumerFactory<String, TransactionAcceptMessage> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, TransactionAcceptMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factoryBuilder(consumerFactory, factory);
+        return factory;
+    }
+
+    @Bean
+    public KafkaConsumer<String, TransactionAcceptMessage> kafkaConsumer() {
+        return new KafkaConsumer<>(commonConsumerProps(), new StringDeserializer(),
+                new JsonDeserializer<>(TransactionAcceptMessage.class, false));
     }
 }
