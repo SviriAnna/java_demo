@@ -35,11 +35,93 @@ public class DataGenerator implements CommandLineRunner {
         }
 
         generateClientWithUnknownStatus();
-        generateClientWithBlockedStatus();
         generateClientWithActiveStatus();
+
+        generateBlockedClients(10);
+        generateBlockedAccounts(10);
+        generateArrestedAccounts(10);
 
         System.out.println("Тестовые данные успешно сгенерированы.");
     }
+
+    private void generateBlockedClients(int count) {
+        for (int i = 0; i < count; i++) {
+            Client client = Client.builder()
+                    .clientId(UUID.randomUUID())
+                    .firstName("Blocked")
+                    .lastName("Client" + i)
+                    .middleName("Test")
+                    .clientStatus(ClientStatus.BLOCKED)
+                    .build();
+
+            client = clientRepository.save(client);
+
+            Account account = Account.builder()
+                    .accountId(UUID.randomUUID())
+                    .client(client)
+                    .accountType(AccountType.DEBIT)
+                    .accountStatus(AccountStatus.OPEN)
+                    .balance(BigDecimal.valueOf(100_000))
+                    .frozenAmount(BigDecimal.ZERO)
+                    .build();
+
+            account = accountRepository.save(account);
+            transactionRepository.saveAll(generateRandomTransactions(account, 5));
+        }
+    }
+
+    private void generateBlockedAccounts(int count) {
+        for (int i = 0; i < count; i++) {
+            Client client = Client.builder()
+                    .clientId(UUID.randomUUID())
+                    .firstName("AccountBlocked")
+                    .lastName("Client" + i)
+                    .middleName("Test")
+                    .clientStatus(ClientStatus.ACTIVE)
+                    .build();
+
+            client = clientRepository.save(client);
+
+            Account account = Account.builder()
+                    .accountId(UUID.randomUUID())
+                    .client(client)
+                    .accountType(AccountType.CREDIT)
+                    .accountStatus(AccountStatus.BLOCKED)
+                    .balance(BigDecimal.valueOf(70_000))
+                    .frozenAmount(BigDecimal.valueOf(10_000))
+                    .build();
+
+            account = accountRepository.save(account);
+            transactionRepository.saveAll(generateRandomTransactions(account, 5));
+        }
+    }
+
+    private void generateArrestedAccounts(int count) {
+        for (int i = 0; i < count; i++) {
+            Client client = Client.builder()
+                    .clientId(UUID.randomUUID())
+                    .firstName("AccountArrested")
+                    .lastName("Client" + i)
+                    .middleName("Test")
+                    .clientStatus(ClientStatus.ACTIVE)
+                    .build();
+
+            client = clientRepository.save(client);
+
+            Account account = Account.builder()
+                    .accountId(UUID.randomUUID())
+                    .client(client)
+                    .accountType(AccountType.DEBIT)
+                    .accountStatus(AccountStatus.ARRESTED)
+                    .balance(BigDecimal.valueOf(50_000))
+                    .frozenAmount(BigDecimal.valueOf(25_000))
+                    .build();
+
+            account = accountRepository.save(account);
+            transactionRepository.saveAll(generateRandomTransactions(account, 5));
+        }
+    }
+
 
     private void generateClientWithUnknownStatus() {
         Client client = Client.builder()

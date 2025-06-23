@@ -14,7 +14,7 @@ public class Service2Client {
 
     private final WebClient webClient;
 
-    public Service2Client(@Value("${integration.url}") String baseUrl) {
+    public Service2Client(@Value("${integration.unblock-server-url}") String baseUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .filter(logRequest())

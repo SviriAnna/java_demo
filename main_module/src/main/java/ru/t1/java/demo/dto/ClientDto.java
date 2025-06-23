@@ -3,8 +3,12 @@ package ru.t1.java.demo.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import ru.t1.java.demo.model.enums.ClientStatus;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -33,5 +37,8 @@ public class ClientDto implements Serializable {
 
     @JsonProperty("middle_name")
     private String middleName;
+
+    @JsonProperty("client_status")
+    private ClientStatus clientStatus;
 
 }

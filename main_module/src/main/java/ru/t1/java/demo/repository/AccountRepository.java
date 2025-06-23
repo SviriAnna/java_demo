@@ -1,11 +1,16 @@
 package ru.t1.java.demo.repository;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.t1.java.demo.model.Account;
+import ru.t1.java.demo.model.Client;
+import ru.t1.java.demo.model.enums.AccountStatus;
+import ru.t1.java.demo.model.enums.ClientStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,5 +31,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query("select a from Account a where a.id = :id")
     Optional<Account> findByIdForUpdate(UUID id);
 
+    Page<Account> findByAccountStatusIn(List<AccountStatus> statuses, Pageable pageable);
+
+    long countByAccountStatusIn(List<AccountStatus> statuses);
 
 }
