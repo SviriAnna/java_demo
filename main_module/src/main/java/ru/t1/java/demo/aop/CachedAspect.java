@@ -1,4 +1,4 @@
-package ru.t1.java.demo.aop;
+package ru.t1.java.demo.aspect;
 
 import ru.t1.java.demo.cache.CacheKey;
 import ru.t1.java.demo.cache.CacheProperties;

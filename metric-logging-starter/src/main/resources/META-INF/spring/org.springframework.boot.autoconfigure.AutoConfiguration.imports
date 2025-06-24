@@ -1,0 +1,3 @@
+ru.t1.java.demo.autoconfig.MetricLoggingAutoConfiguration
+ru.t1.java.demo.autoconfig.KafkaAutoConfiguration
+ru.t1.java.demo.autoconfig.SchemaAutoConfig

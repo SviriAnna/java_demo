@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.aop.annotation.Cached;
-import ru.t1.java.demo.aop.annotation.LogDataSourceError;
-import ru.t1.java.demo.aop.annotation.Metric;
+import ru.t1.java.demo.aspect.annotation.Cached;
 import ru.t1.java.demo.dto.TransactionDto;
 import ru.t1.java.demo.dto.TransactionResultDto;
 import ru.t1.java.demo.exception.AccountNotFoundException;
@@ -40,8 +38,6 @@ public class TransactionServiceImpl implements TransactionService {
     private int maxRejectedCount;
 
     @Cached
-    @Metric
-    @LogDataSourceError
     @Override
     public TransactionDto getTransaction(UUID id) {
         Transaction transaction = transactionRepository.findById(id)
@@ -50,8 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Cached
-    @Metric
-    @LogDataSourceError
     @Override
     public List<TransactionDto> getAllTransactionsByAccountId(UUID accountId) {
         boolean accountExists = accountRepository.existsById(accountId);
@@ -67,8 +61,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Cached
-    @Metric
-    @LogDataSourceError
     @Override
     public List<TransactionDto> getAllTransactions() {
         return transactionRepository.findAll()
@@ -77,8 +69,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .collect(Collectors.toList());
     }
 
-    @Metric
-    @LogDataSourceError
     @Transactional
     @Override
     public TransactionDto save(TransactionDto transactionDto) {
@@ -99,8 +89,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionMapper.toDto(saved);
     }
 
-    @Metric
-    @LogDataSourceError
     @Transactional
     @Override
     public TransactionDto update(TransactionDto transactionDto) {
@@ -125,8 +113,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionMapper.toDto(updated);
     }
 
-    @Metric
-    @LogDataSourceError
     @Transactional
     @Override
     public void deleteById(UUID id) {

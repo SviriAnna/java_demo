@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +29,10 @@ import java.util.Map;
 @Slf4j
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${t1.kafka.server}")
     private String servers;
 
-    @Value("${spring.kafka.consumer.group-id}")
+    @Value("${kafka.consumer.group-id}")
     private String consumerGroupId;
 
     @Value("${t1.kafka.session.timeout.ms:45000}")
@@ -46,7 +47,7 @@ public class KafkaConfig {
     @Value("${t1.kafka.max.poll.interval.ms:300000}")
     private String maxPollIntervalsMs;
 
-    @Value("${spring.kafka.consumer.heartbeat.interval}")
+    @Value("${kafka.consumer.heartbeat.interval}")
     private String heartbeatInterval;
 
     // ==== CONSUMER CONFIGURATION ====
@@ -98,7 +99,7 @@ public class KafkaConfig {
 
     // ==== PRODUCER CONFIGURATION ====
 
-    @Bean
+    @Bean("duplicateTransactionProducerFactory")
     public ProducerFactory<String, TransactionResultMessage> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
@@ -108,8 +109,9 @@ public class KafkaConfig {
         return new DefaultKafkaProducerFactory<>(props);
     }
 
-    @Bean
-    public KafkaTemplate<String, TransactionResultMessage> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    @Bean("duplicateTransactionKafkaTemplate")
+    public KafkaTemplate<String, TransactionResultMessage> kafkaTemplate(
+            @Qualifier("duplicateTransactionProducerFactory") ProducerFactory<String, TransactionResultMessage> pf) {
+        return new KafkaTemplate<>(pf);
     }
 }

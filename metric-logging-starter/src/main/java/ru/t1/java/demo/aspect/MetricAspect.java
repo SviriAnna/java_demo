@@ -1,4 +1,4 @@
-package ru.t1.java.demo.aop;
+package ru.t1.java.demo.aspect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Aspect
-@Component
 @Order(3)
 @RequiredArgsConstructor
 public class MetricAspect {
@@ -32,7 +31,7 @@ public class MetricAspect {
     @Value("${metric.method-time-limit}")
     private long MAX_WANTED_TIME;
 
-    @Around("@annotation(ru.t1.java.demo.aop.annotation.Metric)")
+    @Around("@annotation(ru.t1.java.demo.annotation.Metric)")
     public Object logExecutionTimeAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodSignature = joinPoint.getSignature().toLongString();
         long startTime = System.currentTimeMillis();
@@ -52,6 +51,7 @@ public class MetricAspect {
                     ProducerRecord<String, String> record = new ProducerRecord<>("t1_demo_metrics", jsonMessage);
                     record.headers().add(new RecordHeader("errorType", "METRICS".getBytes(StandardCharsets.UTF_8)));
 
+//                    throw new RuntimeException("Искусственная ошибка отправки в Kafka");
                     kafkaTemplate.send(record);
                     log.info("Сообщение METRICS отправлено в Kafka: {}", jsonMessage);
                 } catch (Exception e) {
@@ -64,7 +64,6 @@ public class MetricAspect {
                 }
             }
         }
-
         return result;
     }
 }

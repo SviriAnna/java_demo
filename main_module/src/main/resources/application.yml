@@ -24,8 +24,8 @@ logging:
 t1:
   scan-path: ru.t1.java.demo
   kafka:
-    bootstrap:
-      server: localhost:29092
+    enabled: true
+    server: localhost:29092
     consumer:
       group-id: t1-demo
       max.poll.records: 10
@@ -35,13 +35,15 @@ t1:
       enable: true
     topic:
       transaction: t1_demo_transactions
-
       transaction_result: t1_demo_transaction_result
+    metricTopic: t1_demo_metrics
     listener:
       poll-timeout: 1000
 
 metric:
   method-time-limit: -1
+  logging:
+    enabled: true
 
 ru.t1.java.demo.cache:
   record-lifetime: 60000
@@ -54,6 +56,10 @@ integration:
 
 transaction:
   max-rejected-count: 5
+
+schema:
+  enabled: true
+
 
 
 

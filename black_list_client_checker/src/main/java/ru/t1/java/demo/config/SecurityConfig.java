@@ -3,6 +3,7 @@ package ru.t1.java.demo.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@Order(1)
 public class SecurityConfig {
 
     private final AuthEntryPointJwt unauthorizedHandler;

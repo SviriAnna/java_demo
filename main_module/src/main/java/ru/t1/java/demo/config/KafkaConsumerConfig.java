@@ -27,7 +27,7 @@ public class KafkaConsumerConfig {
 
     @Value("${t1.kafka.consumer.group-id}")
     private String groupId;
-    @Value("${t1.kafka.bootstrap.server}")
+    @Value("${t1.kafka.server}")
     private String servers;
     @Value("${t1.kafka.session.timeout.ms:45000}")
     private String sessionTimeout;

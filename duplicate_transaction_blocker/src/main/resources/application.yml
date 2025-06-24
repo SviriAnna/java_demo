@@ -6,31 +6,32 @@ spring:
     name: duplicate-transaction-blocker
   jackson:
     property-naming-strategy: SNAKE_CASE
-
-  kafka:
-    bootstrap-servers: localhost:29092
-    consumer:
-      group-id: duplicate-checker-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: ru.t1.java.demo.kafka.JsonKafkaDeserializer
-      heartbeat.interval: 3000
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: ru.t1.java.demo.kafka.JsonKafkaSerializer
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+kafka:
+  consumer:
+    group-id: duplicate-checker-group
+    auto-offset-reset: earliest
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: ru.t1.java.demo.kafka.JsonKafkaDeserializer
+    heartbeat.interval: 3000
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: ru.t1.java.demo.kafka.JsonKafkaSerializer
+  topics:
+    transaction_accept: t1_demo_transaction_accept
+    transaction_result: t1_demo_transaction_result
+
+t1:
+  kafka:
+    server: localhost:29092
+    enabled: true
 
 # Конфиг для логики блокировки
 transaction-checker:
   window-seconds: 30     # Период времени T
   threshold: 5        # Максимальное число транзакций N в период T
-
-# Топики
-kafka:
-  topics:
-    transaction_accept: t1_demo_transaction_accept
-    transaction_result: t1_demo_transaction_result
 
 logging:
   level:

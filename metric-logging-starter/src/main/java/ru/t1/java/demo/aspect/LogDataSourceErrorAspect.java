@@ -1,6 +1,7 @@
-package ru.t1.java.demo.aop;
+package ru.t1.java.demo.aspect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
@@ -11,10 +12,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 import ru.t1.java.demo.dto.DataSourceErrorLogDto;
 import ru.t1.java.demo.model.DataSourceErrorLog;
-import ru.t1.java.demo.service.DataSourceErrorLogService;
+import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -22,21 +22,15 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Aspect
-@Component
 @Order(2)
+@RequiredArgsConstructor
 public class LogDataSourceErrorAspect {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final DataSourceErrorLogService dataSourceErrorLogService;
+    private final DataSourceErrorLogRepository dataSourceErrorLogRepository;
     private final ObjectMapper objectMapper;
 
-    public LogDataSourceErrorAspect(@Qualifier("stringKafkaTemplate") KafkaTemplate<String, String> kafkaTemplate, DataSourceErrorLogService dataSourceErrorLogService, ObjectMapper objectMapper) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.dataSourceErrorLogService = dataSourceErrorLogService;
-        this.objectMapper = objectMapper;
-    }
-
-    @Pointcut("@annotation(ru.t1.java.demo.aop.annotation.LogDataSourceError)")
+    @Pointcut("@annotation(ru.t1.java.demo.annotation.LogDataSourceError)")
     public void loggingDataSourcePointcut() {}
 
     @AfterThrowing(pointcut = "loggingDataSourcePointcut()", throwing = "ex")
@@ -52,6 +46,7 @@ public class LogDataSourceErrorAspect {
             ProducerRecord<String, String> record = new ProducerRecord<>("t1_demo_metrics", jsonMessage);
             record.headers().add(new RecordHeader("errorType", "DATA_SOURCE".getBytes(StandardCharsets.UTF_8)));
 
+//            throw new RuntimeException("Искусственная ошибка отправки в Kafka");
             kafkaTemplate.send(record);
             log.info("Сообщение DATA_SOURCE отправлено в Kafka: {}", jsonMessage);
         } catch (Exception kafkaEx) {
@@ -61,7 +56,7 @@ public class LogDataSourceErrorAspect {
             entity.setMethodSignature(methodSignature);
             entity.setMessage(message);
             entity.setStackTrace(stackTrace);
-            dataSourceErrorLogService.save(entity);
+            dataSourceErrorLogRepository.save(entity);
 
             log.info("Вместо отправки сообщение записано в БД: {}", entity);
         }
